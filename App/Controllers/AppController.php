@@ -18,12 +18,21 @@ class AppController extends Action {
 
 		$tweet->__set('id_usuario', $_SESSION['id']);
 
-		$tweets = $tweet->getAll();
+		$pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+		$total_registros = 5;
+		$deslocamento = ($pagina - 1) * $total_registros;
 
-		$this->view->tweets = $tweets;
 
 		$usuario = Container::getModel('Usuario');
 		$usuario->__set('id', $_SESSION['id']);
+
+		$tweets = $tweet->getPorPagina($total_registros, $deslocamento);
+		$total_tweets = $tweet->getTotalRegistro();
+		$this->view->total_de_paginas = ceil($total_tweets['total'] / $total_registros);
+		$this->view->pagina_ativa = $pagina;
+
+		$this->view->tweets = $tweets;
+
 
 		$this->view->info_usuario = $usuario->getInfoUsuario();
 		$this->view->total_tweets = $usuario->getTotalTweets();
